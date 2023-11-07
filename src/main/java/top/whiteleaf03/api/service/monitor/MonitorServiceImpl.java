@@ -41,6 +41,7 @@ public class MonitorServiceImpl implements MonitorService {
     @Scheduled(fixedRate = 5000)
     public void saveContainerInfo() {
         try {
+            String date = nodeInfoDateFormat.format(new Date());
             List<ContainerInfoVO> containerInfoVOList = new ArrayList<>();
             for (String containerName : containerList) {
                 Process process = Runtime.getRuntime().exec("docker stats --no-stream " + containerName);
@@ -57,7 +58,7 @@ public class MonitorServiceImpl implements MonitorService {
                     String memoryUsage = parts[3].replace("MiB", "");
                     String memoryLimit = parts[5].replace("MiB", "");
                     String memoryPercent = parts[6].replace("%", "");
-                    containerInfoVOList.add(new ContainerInfoVO(containerName, memoryUsage, memoryLimit, memoryPercent, cpuUsage, nodeInfoDateFormat.format(new Date())));
+                    containerInfoVOList.add(new ContainerInfoVO(containerName, memoryUsage, memoryLimit, memoryPercent, cpuUsage, date));
                 }
             }
             putInfoToRedis(JSONUtil.toJsonStr(containerInfoVOList));
